@@ -1,4 +1,5 @@
-let MofslOpenApi = require('./MOFSLOPENAPI_NodejsV2.1');
+
+let MofslOpenApi = require('./MOFSLOPENAPI_NodejsV2.3');
 let readline = require('readline-sync');
 
 // Refer README for Info
@@ -128,16 +129,16 @@ Mofsl.SystemInfo().then((data) => {
     // //-----------------End of Position Conversion --------------
 
     // //----------------- Get LTP message --------------
-    let LTPData = {
-        clientcode: clientcode,
-        exchange: "BSE",
-        scripcode: 500317
-    }
-    return Mofsl.GetLtp(LTPData)
+    // let LTPData = {
+    //     clientcode: clientcode,
+    //     exchange: "BSE",
+    //     scripcode: 500317
+    // }
+    // return Mofsl.GetLtp(LTPData)
     // //-----------------End of Get LTP message --------------
 
     // // GetPosition
-    // return Mofsl.GetPosition(clientcode);
+    return Mofsl.GetPosition(clientcode);
 
     // // GetTradeBook
     // return Mofsl.GetTradeBook(clientcode);
@@ -163,6 +164,9 @@ Mofsl.SystemInfo().then((data) => {
     // // GetTradeDetailByUniqueorderID
     // return Mofsl.GetTradeDetailByUniqueorderID("0600009T024312",clientcode);
 
+    // // TradeWebhook
+    // return Mofsl.TradeWebhook(userID)
+
     // GetBrokerageDetail
     // return Mofsl.GetBrokerageDetail(clientcode, "NSE", "A");
 
@@ -177,15 +181,15 @@ Mofsl.SystemInfo().then((data) => {
         // ------------------------------Trade WebSocket-----------------------------
         // --------------------------------------------------------------------------
     }).then(() => {
-        // Mofsl.TradeStatus_connect();  
+        Mofsl.TradeStatus_connect();  
     }).then(() => {
-        // Mofsl.Tradelogin();
+        Mofsl.Tradelogin();
     }).then(() => {
-        // Mofsl.TradeSubscribe();
+        Mofsl.TradeSubscribe();
     }).then(() => {
         // Mofsl.TradeUnsubscribe();
     }).then(() => {
-        // Mofsl.OrderSubscribe();
+        Mofsl.OrderSubscribe();
     }).then(() => {
         // Mofsl.OrderUnsubscribe();
     }).then(() => {

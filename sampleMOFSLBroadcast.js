@@ -1,114 +1,105 @@
-let MofslOpenApi = require('./MOFSLOPENAPI_NodejsV2.1');
-let readline = require('readline-sync');
+Implementation guide
 
-// --------------------------------------------------------------------------
-// ------------------------------Broadcast WebSocket-------------------------
-// --------------------------------------------------------------------------
+Updated Date: 09-01-2024
+SDK VERSION: "Nodejs 2.3"
 
-// Refer README for Info
-userID = "";
-password = "";
-PANorDOB = "";
-vendorId = "";
-totp = "";  //Google Authenticator OTP
-SourceId = "WEB";       //WEB, DESKTOP
-BrowserName = "Chrome";
-BrowserVersion = "104";
+1. Use NodeJs Version
+	NodeJs Version = 14.17.3 
+	If run with any lower version, It may cause error. 
 
-// You wil get Your api key from website
-Apikey = "";
+2. Packages Used
+	1. address
+	2. axios
+	3. buffer
+	4. crypto
+	5. ip
+	6. public-ip
+	7. python-struct
+	8. ws
+	9. fs
+	10. os
+	11. systeminformation 
+	Not included in SDK, can installed with 'npm install' command. Use the exact version as in 'package.json' dependencies.
 
-clientcode = "";
+3. ApiKey
+	ApiKey will be obtain from website 
 
-// Set Url for LIVE or UAT Testing
-// Enter Base Url
-Base_Url = "https://uatopenapi.motilaloswal.com";
+4. userID, password, clientcode, Two_FA, vendorinfo, totp
+	1. userID and password is your trading account username and password
+	2. clientcode only needed in case of dealer, else always keep clientcode = ""
+	3. Two_FA as per user defined DOB or PAN in string format
+	4. vendorinfo - clientcode
+	5. totp - Google Authentication OTP, if not keed totp = ""
 
-// Initialize MofslOpenApi using Apikey and Base_Url, SourceId, BrowserName and BrowserVersion
-let Mofsl = new MofslOpenApi(Apikey, Base_Url, SourceId, BrowserName, BrowserVersion);
+5. Set Url
+	Enter Base Url for LIVE or UAT Testing 
+	1. For live 
+	   Base_Url = "https://openapi.motilaloswal.com"
+	2. For UAT
+	   Base_Url = "https://uatopenapi.motilaloswal.com"
 
-// Uncomment console.log statement to execute
-// SysteInfo, LocationInfo and then Login request will always be first request with each following request
+6. Initialize MofslOpenApi
+	Initialize MofslOpenApi using Apikey, Base_Url and SourceId
+		- SourceId: WEB or DESKTOP
 
-Mofsl.SystemInfo().then((data) => {
-    Mofsl.setdeviceModel(data.model);
-    Mofsl.setManufacture(data.manufacturer);
+7. Uncomment console.log statement to execute
+	SystemInfo and then Login request will always be first request with each following request 
 
-}).then(() => {
-    return Mofsl.GetPublicIP();
+8. To resend otp uncomment resendotp(). You will receive an OTP on registered Mobile and Email
 
-}).then((message) => {
-    return Mofsl.setClientPublicIp(message);
+9. To verify otp Uncomment verifyotp(otp)
+	- If you are passing totp (Google Authenticator OTP) in Login, you do not have need to verifyotp
+		
+	   
+# -----------------------------------------------WebSocket------------------------------------------------
 
-}).then(() =>{
-    return Mofsl.GetLocationInfo()
-    
-}).then((location) => {
-    Mofsl.setLocationInfo(location)
-    return Mofsl.Login(userID, password, PANorDOB, vendorId, totp)
+1. Repeat all above Instructions 
 
-}).then((message) => {
-        console.log("LOGIN :: ", message);
+2. Keep Login request Uncomment for Validation to use WebSocket
 
-        // if (totp === "" || message.isAuthTokenVerified == 'FALSE') {
-        //     // Enter OTP from console
-        //     var MobileEmailOTP = readline.question('Enter OTP: ')
-        //     // // Verify OTP
-        //     return Mofsl.verifyotp(MobileEmailOTP);
-        //     // return Mofsl.resendotp();
-        // }
-    }).then((message) => {
-        // console.log(message);
-        // return Mofsl.verifyotp(otp);
-        
-    }).then((message) => {
-        // console.log(message);
-        return Mofsl.GetMaxBroadcastLimit(clientcode);
+3. Uncomment Mofsl.TradeStatus_connect() to use OpenAPI Trade Websocket 
 
-    }).then(() => {
-        return Mofsl.Broadcast_connect();
+	1. To send Request for Authorization:
+		Mofsl.Tradelogin();
 
-    }).then(() => {
-        Mofsl.Register("MCX", "DERIVATIVES", 250058);
-        Mofsl.Register("BSE", "CASH", 532540);
-        // Mofsl.UnRegister("BSE", "CASH", 532540);
+	2. To send Request for TradeSubscription:
+		Mofsl.TradeSubscribe();
 
-        // // // Index BSE, NSE
-        // Mofsl.IndexRegister("NSE");
-        // Mofsl.IndexUnregister("NSE");
+	3. To send Request for TradeUnsubscription:
+		Mofsl.TradeUnsubscribe();
 
-        // Mofsl.IndexRegister("BSE");
-        // Mofsl.IndexUnregister("BSE");
+	4. To send Request for OrderSubscription:
+		Mofsl.OrderSubscribe();
 
-        // Logout Broadcast
-        // Mofsl.BroadcastLogout();
-    })
-    .catch((e) => {
-        console.log("ERROR :: ", e.message);
-    })
+	5. To send Request for OrderUnsubscription:
+		Mofsl.OrderUnsubscribe();
 
-Mofsl.onBroadcast('tick', onBroadcastResponse);
+	6. To send Request for Logout:
+		Mofsl.Tradelogout();
 
-function onBroadcastResponse(message) {
-    if (message.Type === "Index") {
-        console.log("Index :: ", message);
-    }
-    else if (message.Type === "LTP") {
-        console.log("LTP :: ", message);
-    }
-    else if (message.Type === "MarketDepth") {
-        console.log("MarketDepth :: ", message);
-    }
-    else if (message.Type === "DayOHLC") {
-        console.log("DayOHLC :: ", message);
-    }
-    else if (message.Type === "DPR") {
-        console.log("DPR :: ", message);
-    }
-    else if (message.Type === "OpenInterest") {
-        console.log("OpenInterest :: ", message);
-    }
-    else {
-        console.log("Broadcast Response :: ", message);
-    }
-}
+4. To set Max Broadcast Limit call Mofsl.GetMaxBroadcastLimit(clientcode) before broadcast connect
+5. Uncomment Mofsl.Broadcast_connect() to use OpenAPI Broadcast Websocket  
+6. Uncomment Mofsl.BroadcastLogout() to Logout Broadcast Websocket
+
+	To Register or Unregister script:
+		1. Register script
+			Mofsl.Register("BSE", "CASH", 532543);
+
+		2. Unregister script
+			Mofsl.UnRegister("BSE", "CASH", 532543);
+
+	To Register or Unregister Index:
+		1. Register Index 
+			Mofsl.IndexRegister("NSE");
+
+		2. Unregister Index
+			Mofsl.IndexUnregister("NSE");
+
+
+	
+	
+
+
+
+
+

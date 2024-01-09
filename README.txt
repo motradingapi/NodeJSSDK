@@ -1,7 +1,7 @@
 Implementation guide
 
-Updated Date: 13-06-2023
-SDK Version: "Nodejs 2.2"
+Updated Date: 09-01-2024
+SDK VERSION: "Nodejs 2.3"
 
 1. Use NodeJs Version
 	NodeJs Version = 14.17.3 
@@ -18,8 +18,7 @@ SDK Version: "Nodejs 2.2"
 	8. ws
 	9. fs
 	10. os
-	11. systeminformation
-	12. ip-to-location 
+	11. systeminformation 
 	Not included in SDK, can installed with 'npm install' command. Use the exact version as in 'package.json' dependencies.
 
 3. ApiKey
@@ -44,13 +43,12 @@ SDK Version: "Nodejs 2.2"
 		- SourceId: WEB or DESKTOP
 
 7. Uncomment console.log statement to execute
-	Get and Set SystemInfo, Get and set LocationInfo then Login request will always be first request with each following request 
-	(Make sure your location is on)
+	SystemInfo and then Login request will always be first request with each following request 
 
 8. To resend otp uncomment resendotp(). You will receive an OTP on registered Mobile and Email
 
 9. To verify otp Uncomment verifyotp(otp)
-	- If you are passing totp (Google Authenticator OTP) in Login, you don't have need to call verifyotp
+	- If you are passing totp (Google Authenticator OTP) in Login, you do not have need to verifyotp
 		
 	   
 # -----------------------------------------------WebSocket------------------------------------------------
@@ -96,3 +94,12 @@ SDK Version: "Nodejs 2.2"
 
 		2. Unregister Index
 			Mofsl.IndexUnregister("NSE");
+
+
+	
+	
+
+
+
+
+

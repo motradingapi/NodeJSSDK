@@ -22,7 +22,7 @@ clientcode = "";
 
 // Set Url for LIVE or UAT Testing
 // Enter Base Url
-Base_Url = "https://uatopenapi.motilaloswal.com";
+Base_Url = "https://openapi.motilaloswaluat.com";
 
 // Initialize MofslOpenApi using Apikey and Base_Url, SourceId, BrowserName and BrowserVersion
 let Mofsl = new MofslOpenApi(Apikey, Base_Url, SourceId, BrowserName, BrowserVersion);
@@ -41,10 +41,10 @@ Mofsl.SystemInfo().then((data) => {
     return Mofsl.setClientPublicIp(message);
 
 }).then(() =>{
-    return Mofsl.GetLocationInfo()
+    // return Mofsl.GetLocationInfo()
     
 }).then((location) => {
-    Mofsl.setLocationInfo(location)
+    // Mofsl.setLocationInfo(location)
     return Mofsl.Login(userID, password, PANorDOB, vendorId, totp)
 
 }).then((message) => {
@@ -77,10 +77,10 @@ Mofsl.SystemInfo().then((data) => {
         // Mofsl.UnRegister("BSE", "CASH", 532540);
 
         // // // Index BSE, NSE
-        Mofsl.IndexRegister("NSE");
+        // Mofsl.IndexRegister("NSE");
         // Mofsl.IndexUnregister("NSE");
 
-        Mofsl.IndexRegister("BSE");
+        // Mofsl.IndexRegister("BSE");
         // Mofsl.IndexUnregister("BSE");
 
         // Logout Broadcast

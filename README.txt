@@ -1,7 +1,7 @@
 Implementation guide
 
-Updated Date: 09-01-2024
-SDK VERSION: "Nodejs 2.3"
+Updated Date: 31-07-2024
+SDK VERSION: "Nodejs 2.3" UAT base URL changes
 
 1. Use NodeJs Version
 	NodeJs Version = 14.17.3 
@@ -36,7 +36,7 @@ SDK VERSION: "Nodejs 2.3"
 	1. For live 
 	   Base_Url = "https://openapi.motilaloswal.com"
 	2. For UAT
-	   Base_Url = "https://uatopenapi.motilaloswal.com"
+	   Base_Url = "https://openapi.motilaloswaluat.com"
 
 6. Initialize MofslOpenApi
 	Initialize MofslOpenApi using Apikey, Base_Url and SourceId

@@ -19,7 +19,7 @@ clientcode = "";
 
 // Set Url for LIVE or UAT Testing
 // Enter Base Url
-Base_Url = "https://uatopenapi.motilaloswal.com";
+Base_Url = "https://openapi.motilaloswaluat.com";
 
 // Initialize MofslOpenApi using Apikey and Base_Url, SourceId, BrowserName and BrowserVersion
 let Mofsl = new MofslOpenApi(Apikey, Base_Url, SourceId, BrowserName, BrowserVersion);
@@ -38,10 +38,12 @@ Mofsl.SystemInfo().then((data) => {
     return Mofsl.setClientPublicIp(message);
     
 }).then((message)=> {
-    return Mofsl.GetLocationInfo(message)
+    // console.log(message);
+    // return Mofsl.GetLocationInfo(message)
 
 }).then((location) => {
-    Mofsl.setLocationInfo(location)
+    // console.log(location)
+    // Mofsl.setLocationInfo(location)
 
     // Login by userId, Password, PANorDOB, vendorId and totp
      return Mofsl.Login(userID, password, PANorDOB, vendorId, totp);
@@ -68,7 +70,7 @@ Mofsl.SystemInfo().then((data) => {
     // console.log(message);
 
     // // GetProfile response for dealer
-    // return Mofsl.GetProfile();
+    return Mofsl.GetProfile();
 
     // // -------------------------Place Order------------------
     // let PlaceOrderInfo = {
@@ -138,7 +140,7 @@ Mofsl.SystemInfo().then((data) => {
     // //-----------------End of Get LTP message --------------
 
     // // GetPosition
-    return Mofsl.GetPosition(clientcode);
+    // return Mofsl.GetPosition(clientcode);
 
     // // GetTradeBook
     // return Mofsl.GetTradeBook(clientcode);
@@ -164,8 +166,13 @@ Mofsl.SystemInfo().then((data) => {
     // // GetTradeDetailByUniqueorderID
     // return Mofsl.GetTradeDetailByUniqueorderID("0600009T024312",clientcode);
 
-    // // TradeWebhook
+
+    // GetReportMargin
+    // return Mofsl.GetReportMargin(clientcode);
+
+    // TradeWebhook
     // return Mofsl.TradeWebhook(userID)
+
 
     // GetBrokerageDetail
     // return Mofsl.GetBrokerageDetail(clientcode, "NSE", "A");

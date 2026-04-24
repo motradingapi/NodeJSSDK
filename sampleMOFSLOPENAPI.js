@@ -1,8 +1,8 @@
 
-let MofslOpenApi = require('./MOFSLOPENAPI_NodejsV2.3');
+let MofslOpenApi = require('./MOFSLOPENAPI_V3.1');
 let readline = require('readline-sync');
 
-// Refer README for Info
+// Dheeraj Sir
 userID = "";
 password = "";
 PANorDOB = "";
@@ -14,6 +14,7 @@ BrowserVersion = "104"
 
 // You wil get Your api key from website
 Apikey = "";
+API_SecretKey = "";
 
 clientcode = "";
 
@@ -22,189 +23,192 @@ clientcode = "";
 Base_Url = "https://openapi.motilaloswaluat.com";
 
 // Initialize MofslOpenApi using Apikey and Base_Url, SourceId, BrowserName and BrowserVersion
-let Mofsl = new MofslOpenApi(Apikey, Base_Url, SourceId, BrowserName, BrowserVersion);
+let Mofsl = new MofslOpenApi(Apikey, Base_Url, SourceId, BrowserName, BrowserVersion, API_SecretKey);
 
-// Uncomment console.log statement to execute
-// SysteInfo, LocationInfo and then Login request will always be first request with each following request
+// Main async function to handle all API calls
+async function runOpenAPISample() {
+    try {
+        // System Info, LocationInfo and then Login request will always be first request with each following request
+        
+        // Get system information
+        const systemData = await Mofsl.SystemInfo();
+        // console.log("System Info:", systemData);
+        await Mofsl.setdeviceModel(systemData.model);
+        await Mofsl.setManufacture(systemData.manufacturer);
 
-Mofsl.SystemInfo().then((data) => {
-    Mofsl.setdeviceModel(data.model);
-    Mofsl.setManufacture(data.manufacturer);
+        // Get public IP
+        const publicIp = await Mofsl.GetPublicIP();
+        const clientPublicIp = await Mofsl.setClientPublicIp(publicIp);
+        // console.log("Client Public IP:", clientPublicIp);
 
-}).then(() => {
-    return Mofsl.GetPublicIP();
+        // Get location information based on public IP
+        const location_info = await Mofsl.GetLocationInfo(clientPublicIp)
+        // console.log("Location Info:", location_info);
 
-}).then((message) => {
-    return Mofsl.setClientPublicIp(message);
-    
-}).then((message)=> {
-    // console.log(message);
-    // return Mofsl.GetLocationInfo(message)
+        // Set location information in Mofsl instance
+        await Mofsl.setLocationInfo(location_info)
 
-}).then((location) => {
-    // console.log(location)
-    // Mofsl.setLocationInfo(location)
+        // Login by userId, Password, PANorDOB, vendorId and totp
+        const loginResponse = await Mofsl.Login(userID, password, PANorDOB, vendorId, totp);
+        console.log("LOGIN :: ", loginResponse);
 
-    // Login by userId, Password, PANorDOB, vendorId and totp
-     return Mofsl.Login(userID, password, PANorDOB, vendorId, totp);
+        // // Handle OTP verification if needed
+        // if (totp === "" || loginResponse.isAuthTokenVerified == 'FALSE')
+        // {
+        //     let MobileEmailOTP = readline.question("Enter 6 Digit OTP : ");
+        //     // Verify OTP received on registered Mobile or Email
+        //     const otpResponse = await Mofsl.verifyotp(MobileEmailOTP);
+        //     console.log("OTP Response:", otpResponse);
+        // }
+        
+        // // Resend OTP on registered Mobile and Email (if needed)
+        // const resendOtpResponse = await Mofsl.resendotp();
+        // console.log("Resend OTP Response:", resendOtpResponse);
 
-}).then((message) => {
-    console.log("LOGIN :: ", message);
+        // Get Access Token - Always call this after Login
+        const accessToken = await Mofsl.GetAccessToken();
+        console.log("Access Token::", accessToken);
 
-    // if (totp === "" || message.isAuthTokenVerified == 'FALSE')
-    // {
-    //     let MobileEmailOTP = readline.question("Enter 6 Digit OTP : ");
+        // Set the access token in header
+        Mofsl.setAccessToken(accessToken.accesstoken);
 
-    //     // Verify OTP received on registered Mobile or Email
-    //     return Mofsl.verifyotp(MobileEmailOTP);
-    // }
-    
-}).then((message) => {
-    
-    // console.log(message);
-    // Resend OTP on registered Mobile and Email
-    // return Mofsl.resendotp();
+        // // GetProfile response 
+        const profileDetails = await Mofsl.GetProfile();
+        console.log("Profile Details::", profileDetails);
 
-}).then((message) => {
+        // -------------------------Place Order------------------
+        // let PlaceOrderInfo = {
+        //     clientcode: clientcode,
+        //     exchange: "NSE",
+        //     symboltoken: 1660,
+        //     buyorsell: "BUY",
+        //     ordertype: "LIMIT",
+        //     producttype: "Normal",
+        //     orderduration: "DAY",
+        //     price: 330,
+        //     triggerprice: 0,
+        //     quantityinlot: 100,
+        //     disclosedquantity: 0,
+        //     amoorder: "Y",
+        //     goodtilldate: "15-Nov-2022",
+        //     tag: ""
+        // }
+        // const placeOrderResponse = await Mofsl.PlaceOrder(PlaceOrderInfo);
+        // console.log("Place Order Response:", placeOrderResponse);
+        // -----------------------------End of Place Order------------------
 
-    // console.log(message);
+        // ------------ Modify Order --------------
+        // let ModifyOrderInfo = {
+        //     clientcode: clientcode,
+        //     uniqueorderid: "0600009T024312",
+        //     newordertype: "NORMAL",
+        //     neworderduration: "GTD",
+        //     newquantityinlot: 100,
+        //     newdisclosedquantity: 0,
+        //     newprice: 20.5,
+        //     newtriggerprice: 0,
+        //     newgoodtilldate: "15-Nov-2022",
+        //     lastmodifiedtime: "08-Nov-2022 11:30:25",
+        //     qtytradedtoday: 0
+        // }
+        // const modifyOrderResponse = await Mofsl.ModifyOrder(ModifyOrderInfo);
+        // console.log("Modify Order Response:", modifyOrderResponse);
+        // ------------End of Modify Order --------------
 
-    // // GetProfile response for dealer
-    return Mofsl.GetProfile();
+        // ---------- Cancel Order ------------
+        // let cancelorderinfo = {
+        //     clientcode: clientcode,
+        //     uniqueorderid: "0600007T024312"
+        // }
+        // const cancelOrderResponse = await Mofsl.CancelOrder(cancelorderinfo);
+        // console.log("Cancel Order Response:", cancelOrderResponse);
+        // -----------End of Cancel Order-------------
 
-    // // -------------------------Place Order------------------
-    // let PlaceOrderInfo = {
-    //     clientcode: clientcode,
-    //     exchange: "NSE",
-    //     symboltoken: 1660,
-    //     buyorsell: "BUY",
-    //     ordertype: "LIMIT",
-    //     producttype: "Normal",
-    //     orderduration: "DAY",
-    //     price: 330,
-    //     triggerprice: 0,
-    //     quantityinlot: 100,
-    //     disclosedquantity: 0,
-    //     amoorder: "Y",
-    //     goodtilldate: "15-Nov-2022",
-    //     tag: ""
-    // }
-    // return Mofsl.PlaceOrder(PlaceOrderInfo);
-    // // -----------------------------End of Place Order------------------
+        // ----------------- Position Conversion --------------
+        // let PositionConversionInfo = {
+        //     clientcode: clientcode,
+        //     exchange: "NSE",
+        //     scripcode: 11536,
+        //     quantity: 1,
+        //     oldproduct: "NORMAL",
+        //     newproduct: "VALUEPLUS"
+        // }
+        // const positionConversionResponse = await Mofsl.PositionConversion(PositionConversionInfo);
+        // console.log("Position Conversion Response:", positionConversionResponse);
+        // -----------------End of Position Conversion --------------
 
-    // ------------ Modify Order --------------
-    // let ModifyOrderInfo = {
-    //     clientcode: clientcode,
-    //     uniqueorderid: "0600009T024312",
-    //     newordertype: "NORMAL",
-    //     neworderduration: "GTD",
-    //     newquantityinlot: 100,
-    //     newdisclosedquantity: 0,
-    //     newprice: 20.5,
-    //     newtriggerprice: 0,
-    //     newgoodtilldate: "15-Nov-2022",
-    //     lastmodifiedtime: "08-Nov-2022 11:30:25",
-    //     qtytradedtoday: 0
-    // }
-    // return Mofsl.ModifyOrder(ModifyOrderInfo);
-    // // ------------End of Modify Order --------------
+        // ----------------- Get LTP message --------------
+        let LTPData = {
+            clientcode: clientcode,
+            exchange: "BSE",
+            scripcode: 500317
+        }
+        const ltpResponse = await Mofsl.GetLtp(LTPData);
+        console.log("LTP Response:", ltpResponse);
+        // -----------------End of Get LTP message --------------
 
+        const positionResponse = await Mofsl.GetPosition(clientcode);
+        console.log("Position Response:", positionResponse);
 
-    // // ---------- Cancel Order ------------
-    // let cancelorderinfo = {
-    //     clientcode: clientcode,
-    //     uniqueorderid: "0600007T024312"
-    // }
-    // return Mofsl.CancelOrder(cancelorderinfo);
-    // // -----------End of Cancel Order-------------
+        const tradeBookResponse = await Mofsl.GetTradeBook(clientcode);
+        console.log("Trade Book Response:", tradeBookResponse);
 
-    // //----------------- Position Conversion --------------
-    // let PositionConversionInfo = {
-    //     clientcode: clientcode,
-    //     exchange: "NSE",
-    //     scripcode: 11536,
-    //     quantity: 1,
-    //     oldproduct: "NORMAL",
-    //     newproduct: "VALUEPLUS"
-    // }
-    // return Mofsl.PositionConversion(PositionConversionInfo);
-    // //-----------------End of Position Conversion --------------
+        const orderBookResponse = await Mofsl.GetOrderBook(clientcode);
+        console.log("Order Book Response:", orderBookResponse);
 
-    // //----------------- Get LTP message --------------
-    // let LTPData = {
-    //     clientcode: clientcode,
-    //     exchange: "BSE",
-    //     scripcode: 500317
-    // }
-    // return Mofsl.GetLtp(LTPData)
-    // //-----------------End of Get LTP message --------------
+        const dpHoldingResponse = await Mofsl.GetDPHolding(clientcode);
+        // console.log("DP Holding Response:", dpHoldingResponse);
 
-    // // GetPosition
-    // return Mofsl.GetPosition(clientcode);
+        // const marginDetailResponse = await Mofsl.GetReportMarginDetail(clientcode);
+        // console.log("Margin Detail Response:", marginDetailResponse);
 
-    // // GetTradeBook
-    // return Mofsl.GetTradeBook(clientcode);
+        // const marginSummaryResponse = await Mofsl.GetReportMarginSummary(clientcode);
+        // console.log("Margin Summary Response:", marginSummaryResponse);
 
-    // // GetOrderBook
-    // return Mofsl.GetOrderBook(clientcode);
+        // const instrumentFileResponse = await Mofsl.GetInstrumentFile("NSEFO", clientcode);
+        // console.log("Instrument File Response:", instrumentFileResponse);
 
-    // // GetDPHolding
-    // return Mofsl.GetDPHolding(clientcode);
+        // const orderDetailResponse = await Mofsl.GetOrderDetailByUniqueorderID("0600009T024312", clientcode);
+        // console.log("Order Detail Response:", orderDetailResponse);
 
-    // // GetReportMarginDetail
-    // return Mofsl.GetReportMarginDetail(clientcode);
+        // const tradeDetailResponse = await Mofsl.GetTradeDetailByUniqueorderID("0600009T024312", clientcode);
+        // console.log("Trade Detail Response:", tradeDetailResponse);
 
-    // // GetReportMarginSummary
-    // return Mofsl.GetReportMarginSummary(clientcode);
+        // const reportMarginResponse = await Mofsl.GetReportMargin(clientcode);
+        // console.log("Report Margin Response:", reportMarginResponse);
 
-    // // GetInstrumentFile
-    // return Mofsl.GetInstrumentFile("NSEFO",clientcode);
+        // const tradeWebhookResponse = await Mofsl.TradeWebhook(userID);
+        // console.log("Trade Webhook Response:", tradeWebhookResponse);
 
-    // // GetOrderDetailByUniqueorderID
-    // return Mofsl.GetOrderDetailByUniqueorderID("0600009T024312", clientcode);
+        const brokerageDetailResponse = await Mofsl.GetBrokerageDetail(clientcode, "NSE", "A");
+        // console.log("Brokerage Detail Response:", brokerageDetailResponse);
 
-    // // GetTradeDetailByUniqueorderID
-    // return Mofsl.GetTradeDetailByUniqueorderID("0600009T024312",clientcode);
-
-
-    // GetReportMargin
-    // return Mofsl.GetReportMargin(clientcode);
-
-    // TradeWebhook
-    // return Mofsl.TradeWebhook(userID)
-
-
-    // GetBrokerageDetail
-    // return Mofsl.GetBrokerageDetail(clientcode, "NSE", "A");
-
-    // // Logout
-    // return Mofsl.Logout(clientcode);
-
-})
-    .then((message) => {
-        console.log("Data::", message);
+        // const logoutResponse = await Mofsl.Logout(clientcode);
+        // console.log("Logout Response:", logoutResponse);
 
         // --------------------------------------------------------------------------
         // ------------------------------Trade WebSocket-----------------------------
         // --------------------------------------------------------------------------
-    }).then(() => {
-        Mofsl.TradeStatus_connect();  
-    }).then(() => {
-        Mofsl.Tradelogin();
-    }).then(() => {
-        Mofsl.TradeSubscribe();
-    }).then(() => {
+        
+        // WebSocket operations (these are not async functions)
+        await Mofsl.TradeStatus_connect();  
+        await Mofsl.Tradelogin();
+        await Mofsl.TradeSubscribe();
         // Mofsl.TradeUnsubscribe();
-    }).then(() => {
-        Mofsl.OrderSubscribe();
-    }).then(() => {
+        await Mofsl.OrderSubscribe();
         // Mofsl.OrderUnsubscribe();
-    }).then(() => {
-        //  Mofsl.Tradelogout();
-    }).catch(ex => {
-        console.log("EXCEPTION::", ex.message);
-    })
+        // Mofsl.Tradelogout();
 
+    } catch (error) {
+        console.log("EXCEPTION::", error.message);
+        console.error("Full Error:", error);
+    }
+}
+
+// Run the demo
+runOpenAPISample();
+
+// WebSocket event handler
 Mofsl.onConnect('tick', TradeStatusResponse);
 
 function TradeStatusResponse(message) {

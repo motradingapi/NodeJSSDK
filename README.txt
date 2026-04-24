@@ -1,11 +1,12 @@
 Implementation guide
 
-Updated Date: 31-07-2024
-SDK VERSION: "Nodejs 2.3" UAT base URL changes
+Updated Date: 19-12-2025
+SDK VERSION: "Nodejs 3.1" API Version Changes and Access Token added in header and API Introduced
+Md5sum: 5e0e4c1290b90ff2686d69c7e6d73812 
 
 1. Use NodeJs Version
 	NodeJs Version = 14.17.3 
-	If run with any lower version, It may cause error. 
+	Running on lower version may cause error. 
 
 2. Packages Used
 	1. address
@@ -21,8 +22,7 @@ SDK VERSION: "Nodejs 2.3" UAT base URL changes
 	11. systeminformation 
 	Not included in SDK, can installed with 'npm install' command. Use the exact version as in 'package.json' dependencies.
 
-3. ApiKey
-	ApiKey will be obtain from website 
+3. ApiKey and APISecretKey will be obtain from website 
 
 4. userID, password, clientcode, Two_FA, vendorinfo, totp
 	1. userID and password is your trading account username and password
@@ -43,12 +43,12 @@ SDK VERSION: "Nodejs 2.3" UAT base URL changes
 		- SourceId: WEB or DESKTOP
 
 7. Uncomment console.log statement to execute
-	SystemInfo and then Login request will always be first request with each following request 
+	SystemInfo and then Login request will always be first request with each following request. Refer sample file function calling sequence.
 
 8. To resend otp uncomment resendotp(). You will receive an OTP on registered Mobile and Email
 
 9. To verify otp Uncomment verifyotp(otp)
-	- If you are passing totp (Google Authenticator OTP) in Login, you do not have need to verifyotp
+	- If you are passing totp (Google Authenticator OTP) in Login, you do not have need to verify otp
 		
 	   
 # -----------------------------------------------WebSocket------------------------------------------------
